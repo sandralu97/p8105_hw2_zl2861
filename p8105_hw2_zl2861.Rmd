@@ -1,69 +1,83 @@
 ---
-title: "data import"
+title: "hw2"
 output: github_document
 ---
 
-I'm an R Markdown document! 
 
-# Section 1
-
-
-```{r}
+```{r setup}
 library(tidyverse)
 library(readxl)
-library(haven)
 ```
 
-# Read in some data
+## Problem 1
+
+Read the Mr. Trashwheel dataset
 
 ```{r}
-litters_df = read.csv("./data/FAS_litters.csv")
-litters_df = janitor::clean_names(litters_df)
+trashwheel_df = 
+  read_xlsx("./Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+            sheet = "Mr. Trash Wheel",
+            range = cell_cols("A:N")
+            ) %>% 
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(
+    sports_balls=round(sports_balls),
+    sports_balls = as.integer(sports_balls)
+  )
 ```
 
-## Take a look at the data
-```{r}
-litters_df
-```
-
-```{r}
-head(litters_df)
-```
-
-```{r}
-skimr::skim(litters_df)
-```
+read precipitation data
 
 ```{r}
-view(litters_df)
+precip_2018=
+  read_xlsx("./Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+            sheet = "2018 Precipitation",
+            skip =1
+            ) %>% 
+  janitor::clean_names() %>% 
+  drop_na(month) %>% 
+  mutate(year=2018) %>% 
+  select(year,everything())
+
+precip_2017=
+  read_xlsx("./Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+            sheet = "2017 Precipitation",
+            skip =1
+            ) %>% 
+  janitor::clean_names() %>% 
+  drop_na(month) %>% 
+  mutate(year=2017) %>% 
+  select(year,everything())
+
 ```
 
-## options to read_csv
-```{r}
-litters_data = read_csv(file = "./data/FAS_litters.csv",
-  skip = 10, col_names = FALSE)
-
-litters_data = read_csv(file = "./data/FAS_litters.csv", na = c("","NA" , 999))
-
-```
-
-## Other file formats: excel
-```{r}
-mlb_df = read_excel("./data/mlb11.xlsx")
-mlb_df = read_excel("./data/mlb11.xlsx", sheet = "mlb11", range = "A1:A7")
-```
-
-## Other file formats: SAS
-
-```{r}
-pulse_df = read_sas ("./data/public_pulse_data.sas7bdat")
-```
-
-
-## export data
+Combine annual precipitation
 
 ```{r}
-write_csv(mlb_df, "./data/mlb_subtable.csv")
+
+month_df = tibble(
+  month_num = 1:12,
+  month_name = month.name
+)
+
+precip_df=
+  bind_rows(precip_2018,precip_2017)
+
+precip_df = left_join(precip_df,month_df,by = c("month" = "month_num"))
 ```
+
+
+This dataset contains information ...
+
+
+
+
+
+
+
+
+
+
 
 

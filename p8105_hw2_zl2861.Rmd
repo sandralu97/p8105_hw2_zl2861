@@ -68,12 +68,23 @@ precip_df = left_join(precip_df,month_df,by = c("month" = "month_num"))
 ```
 
 
-This dataset contains information ...
+Dataset "trashwheel_df" contains the information of statistics of each dumpter with the year range of `r range(pull(trashwheel_df,year))`. There are totally `r nrow(trashwheel_df)` of observations. It also contains the weight, volume as well as the number and type of trash collected. 
+Dataset "precip_data" contains the information of total precipitation in each month with the year range of `r range(pull(precip_df,year))`. There are totally `r nrow(precip_df)` observations.
+Total precipitation in 2018 is `r filter(precip_df,year==2018) %>% pull(total) %>% sum()`(in).
+The median number of sports balls in a dumpster in 2017 is `r filter(trashwheel_df,year==2017) %>% pull(sports_balls) %>% median()`.
 
 
+## Problem 2
 
+Read & clean data
 
+```{r}
+subway = read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv",col_types = '-ccnnffffffffffffc-f--l---------') %>% 
+  janitor::clean_names()
+  mutate (subway, entry=as.logical(ifelse(pull(subway, entry)=="YES",1, 0))) 
+```
 
+In this datasets, the dimension is `r ncol(subway)*nrow(subway)`. The variables include `r colnames(subway)`
 
 
 

@@ -79,23 +79,100 @@ The median number of sports balls in a dumpster in 2017 is `r filter(trashwheel_
 Read & clean data
 
 ```{r}
-subway = read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv",col_types = '-ccnnffffffffffffc-f--l---------') %>% 
+subway = read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv",col_types = '-ccnnccccccccccccf-f--l---------') %>% 
   janitor::clean_names() %>% 
   rename(ADA_compliance=ada)
   mutate (subway, entry=as.logical(ifelse(pull(subway, entry)=="YES",1, 0))) 
 ```
 
-In this datasets, the dimension is `r ncol(subway)`*`r nrow(subway)`. The variables include `r colnames(subway)`.
+In this datasets, the dimension is `r nrow(subway)`*`r ncol(subway)`. The variables include `r colnames(subway)`.
 
 **How many distinct stations are there?**
+
 There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% nrow()` distinct stations
 
 **How many stations are ADA compliant**
+
 There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% filter(ADA_compliance == TRUE) %>% nrow()` stations that are ADA compliant.
 
 
 **What proportion of station entrances / exits without vending allow entrance?**
+
 `r filter(subway,vending=="NO"& entry=="YES") %>% nrow()/filter(subway,vending=="NO") %>% nrow()*100` % of station entrances / exits without vending allow entrance.
 
 
+##reformat data##
+
+```{r}
+subway_distinct = distinct(subway, line, station_name, .keep_all = TRUE) %>%  
+  pivot_longer(
+               route1:route11,
+               names_to = "route_name",
+               names_prefix = "route",
+               values_to = "route_number"
+               ) %>% 
+  drop_na(route_number)
+```
+
+**How many distinct stations serve the A train?**
+
+`r filter(subway_distinct,route_number == "A") %>% nrow()` distinct stations serve the A train
+
+**Of the stations that serve the A train, how many are ADA compliant?**
+
+Among stations that serve the A train, `r filter(subway_distinct,route_number == "A"& ADA_compliance == TRUE) %>% nrow()` are ADA compliant.
+
+## Problem 3
+
+clean the pols-month data
+```{r}
+pols_df = read_csv("./fivethirtyeight_datasets/pols-month.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(mon,into = c("year","month","day"),remove = TRUE,convert = TRUE)
+
+pols_df = left_join(pols_df,month_df,by = c("month" = "month_num")) %>% 
+  select(-c(month,day)) %>% 
+  select(year, month = month_name,everything()) %>% 
+  mutate (
+    president = case_when(
+      prez_dem == 1 ~"dem",
+      prez_gop == 1 ~ "gop"
+    )
+  ) %>% 
+  select(-c(prez_dem,prez_gop))
+```
+
+clean the snp.csv data
+
+```{r}
+snp_df = read_csv("./fivethirtyeight_datasets/snp.csv") %>% 
+  janitor::clean_names()%>% 
+  separate(date,into = c("month","day","year"),remove = TRUE,convert = TRUE)
+
+snp_df = left_join(snp_df,month_df,by = c("month" = "month_num")) %>% 
+  select(-c(month,day)) %>% 
+  select(year, month = month_name,everything()) %>% 
+  arrange(year,month)
+```
+
+clean the unemployment data
+
+```{r}
+unemployment_df = read_csv("./fivethirtyeight_datasets/unemployment.csv") %>% 
+  janitor::clean_names()%>% 
+rename(January=jan, February=feb,March=mar,April=apr,May=may,June=jun,July=jul,August=aug,September=sep,October=oct,November=nov,December=dec) %>% 
+  pivot_longer(
+    January:December,
+    names_to = "month",
+    values_to = "unemployment"
+  )
+```
+
+merge the datasets
+
+```{r}
+combined_df = left_join(pols_df,snp_df,by = c("year","month")) %>% 
+  left_join(unemployment_df,by = c("year","month"))
+
+```
 

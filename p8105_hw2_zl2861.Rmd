@@ -68,9 +68,11 @@ precip_df = left_join(precip_df,month_df,by = c("month" = "month_num"))
 ```
 
 
-Dataset "trashwheel_df" contains the information of statistics of each dumpter with the year range of `r range(pull(trashwheel_df,year))`. There are totally `r nrow(trashwheel_df)` of observations. It also contains the weight, volume as well as the number and type of trash collected. 
-Dataset "precip_data" contains the information of total precipitation in each month with the year range of `r range(pull(precip_df,year))`. There are totally `r nrow(precip_df)` observations.
+Dataset **"trashwheel_df"** contains the information of statistics of each dumpter with the year range of `r range(pull(trashwheel_df,year))`. There are totally `r nrow(trashwheel_df)` of observations. It also contains the weight, volume as well as the number and type of trash collected. 
+Dataset **"precip_data"** contains the information of total precipitation in each month with the year range of `r range(pull(precip_df,year))`. There are totally `r nrow(precip_df)` observations.
+
 Total precipitation in 2018 is `r filter(precip_df,year==2018) %>% pull(total) %>% sum()`(in).
+
 The median number of sports balls in a dumpster in 2017 is `r filter(trashwheel_df,year==2017) %>% pull(sports_balls) %>% median()`.
 
 
@@ -85,7 +87,7 @@ subway = read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv",col_types = 
   mutate (subway, entry=as.logical(ifelse(pull(subway, entry)=="YES",1, 0))) 
 ```
 
-In this datasets, the dimension is `r nrow(subway)`*`r ncol(subway)`. The variables include `r colnames(subway)`.
+This data contains information and statistics from the trash collectors in Baltimore, Maryland. It include the number of different type of trash at a given time. In this datasets, the dimension is `r nrow(subway)`*`r ncol(subway)`. The file was imported with specified variable type assigned with function "col_types". Then the column name was cleaned with "clean_names()". Column name "ada" was renamed into "ADA_compliance" for clarification. Lastly, variable "entry" was changed to logical variable.
 
 **How many distinct stations are there?**
 
@@ -101,7 +103,7 @@ There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% filter(A
 `r filter(subway,vending=="NO"& entry=="YES") %>% nrow()/filter(subway,vending=="NO") %>% nrow()*100` % of station entrances / exits without vending allow entrance.
 
 
-##reformat data##
+reformat data
 
 ```{r}
 subway_distinct = distinct(subway, line, station_name, .keep_all = TRUE) %>%  
@@ -176,3 +178,10 @@ combined_df = left_join(pols_df,snp_df,by = c("year","month")) %>%
 
 ```
 
+The dataset **"pols_df"** contains information of national politicians who are democratic or republican. The key variables include whether president was democratic or republican at a given time, as well as number of governers, senators and representativs from the two parties. The dimension of pols dataset is `r nrow(pols_df)`*`r ncol(pols_df)`. The year range is [`r range(pull(pols_df,year))`].
+
+The dataset **"snp_df"** contains the information of the closing value Standard & Poor's stock market index (S&P) at a given time. The specific date was dropped but year and month were kept to merge with other datasets.The dimension of dataset is `r nrow(snp_df)`*`r ncol(snp_df)`. The year range is [`r range(pull(snp_df,year))`].
+
+The dataset **"unemployment_df"** contains the perceptage of unemployment in a given month and year. The dimension of dataset is `r nrow(unemployment_df)`*`r ncol(unemployment_df)`. The year range is [`r range(pull(unemployment_df,year))`].
+
+The **combined dataset** merged from pols_df, snp_df and unemployment_df provide information on politicians at a given time, and economic performance (represented by S&P) and unemployment at that time. The dimension of the resulting data is `r nrow(combined_df)`*`r ncol(combined_df)`. The year range is [`r range(pull(combined_df,year))`]. The politician affiliation of the president was represented by variable "president". The S&P value was represented by variable "closing" and the unemployment rate was represented by variable "unemployment".

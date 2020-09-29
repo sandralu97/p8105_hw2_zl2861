@@ -1,5 +1,7 @@
 ---
-title: "hw2"
+title: "Homework 2"
+author: "Sandra Lu"
+date: 2020-09-30
 output: github_document
 ---
 
@@ -27,7 +29,7 @@ trashwheel_df =
   )
 ```
 
-read precipitation data
+Read precipitation data
 
 ```{r}
 precip_2018=
@@ -103,7 +105,7 @@ There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% filter(A
 `r filter(subway,vending=="NO"& entry=="YES") %>% nrow()/filter(subway,vending=="NO") %>% nrow()*100` % of station entrances / exits without vending allow entrance.
 
 
-reformat data
+Reformat data
 
 ```{r}
 subway_distinct = distinct(subway, line, station_name, .keep_all = TRUE) %>%  
@@ -126,7 +128,7 @@ Among stations that serve the A train, `r filter(subway_distinct,route_number ==
 
 ## Problem 3
 
-clean the pols-month data
+Clean the pols-month data
 ```{r}
 pols_df = read_csv("./fivethirtyeight_datasets/pols-month.csv") %>% 
   janitor::clean_names() %>% 
@@ -144,7 +146,7 @@ pols_df = left_join(pols_df,month_df,by = c("month" = "month_num")) %>%
   select(-c(prez_dem,prez_gop))
 ```
 
-clean the snp.csv data
+Clean the snp.csv data
 
 ```{r}
 snp_df = read_csv("./fivethirtyeight_datasets/snp.csv") %>% 
@@ -157,7 +159,7 @@ snp_df = left_join(snp_df,month_df,by = c("month" = "month_num")) %>%
   arrange(year,month)
 ```
 
-clean the unemployment data
+Clean the unemployment data
 
 ```{r}
 unemployment_df = read_csv("./fivethirtyeight_datasets/unemployment.csv") %>% 
@@ -170,7 +172,7 @@ rename(January=jan, February=feb,March=mar,April=apr,May=may,June=jun,July=jul,A
   )
 ```
 
-merge the datasets
+Merge the datasets
 
 ```{r}
 combined_df = left_join(pols_df,snp_df,by = c("year","month")) %>% 

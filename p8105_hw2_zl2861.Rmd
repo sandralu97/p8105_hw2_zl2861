@@ -80,15 +80,22 @@ Read & clean data
 
 ```{r}
 subway = read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv",col_types = '-ccnnffffffffffffc-f--l---------') %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  rename(ADA_compliance=ada)
   mutate (subway, entry=as.logical(ifelse(pull(subway, entry)=="YES",1, 0))) 
 ```
 
-In this datasets, the dimension is `r ncol(subway)*nrow(subway)`. The variables include `r colnames(subway)`
+In this datasets, the dimension is `r ncol(subway)`*`r nrow(subway)`. The variables include `r colnames(subway)`.
+
+**How many distinct stations are there?**
+There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% nrow()` distinct stations
+
+**How many stations are ADA compliant**
+There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% filter(ADA_compliance == TRUE) %>% nrow()` stations that are ADA compliant.
 
 
-
-
+**What proportion of station entrances / exits without vending allow entrance?**
+`r filter(subway,vending=="NO"& entry=="YES") %>% nrow()/filter(subway,vending=="NO") %>% nrow()*100` % of station entrances / exits without vending allow entrance.
 
 
 

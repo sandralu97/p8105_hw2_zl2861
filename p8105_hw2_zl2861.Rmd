@@ -89,7 +89,7 @@ subway = read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv",col_types = 
   mutate (subway, entry=as.logical(ifelse(pull(subway, entry)=="YES",1, 0))) 
 ```
 
-This data contains information and statistics from the trash collectors in Baltimore, Maryland. It include the number of different type of trash at a given time. In this datasets, the dimension is `r nrow(subway)`*`r ncol(subway)`. The file was imported with specified variable type assigned with function "col_types". Then the column name was cleaned with "clean_names()". Column name "ada" was renamed into "ADA_compliance" for clarification. Lastly, variable "entry" was changed to logical variable.
+This data contains information and statistics of NYC subway. It includes the line & stations name and routes served as well as other features such as ADA compliance. In this datasets, the dimension is `r nrow(subway)`*`r ncol(subway)`. The file was imported with specified variable type assigned with function "col_types". Then the column name was cleaned with "clean_names()". Column name "ada" was renamed into "ADA_compliance" for clarification. Lastly, variable "entry" was changed to logical variable.
 
 **How many distinct stations are there?**
 
@@ -105,11 +105,10 @@ There are `r distinct(subway, line, station_name, .keep_all = TRUE) %>% filter(A
 `r filter(subway,vending=="NO"& entry=="YES") %>% nrow()/filter(subway,vending=="NO") %>% nrow()*100` % of station entrances / exits without vending allow entrance.
 
 
-Reformat data
+Reformat data so that route number and route name are distinct variable
 
 ```{r}
-subway_distinct = distinct(subway, line, station_name, .keep_all = TRUE) %>%  
-  pivot_longer(
+subway_distinct = pivot_longer(subway,
                route1:route11,
                names_to = "route_name",
                names_prefix = "route",
@@ -119,6 +118,12 @@ subway_distinct = distinct(subway, line, station_name, .keep_all = TRUE) %>%
 ```
 
 **How many distinct stations serve the A train?**
+
+reformat the dataset so that only distinct subway stations are kept
+```{r}
+subway_distinct = distinct(subway_distinct, line, station_name, .keep_all = TRUE)
+```
+
 
 `r filter(subway_distinct,route_number == "A") %>% nrow()` distinct stations serve the A train
 
